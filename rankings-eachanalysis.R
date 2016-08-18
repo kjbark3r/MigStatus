@@ -22,3 +22,13 @@ rm(wd_workcomp, wd_laptop)
 ##PACKAGES
 library(dplyr)
 
+##DATA
+mig <- read.csv("migration-analysis.csv") %>%
+  mutate(Year = ifelse(grepl("-14", mig$IndivYr), 2014, 2015)) %>%
+  transform(SprAORank = ave(SprAO, Year, FUN = function(x) rank(-x, ties.method = "average")),
+            FallAORank = ave(FallAO, Year, FUN = function(x) rank(-x, ties.method = "average")),
+            SprNSDRank = ave(SprNSD, Year, FUN = function(x) rank(x, ties.method = "average")),
+            FallNSDRank = ave(FallNSD, Year, FUN = function(x) rank(x, ties.method = "average")))
+
+
+

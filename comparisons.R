@@ -21,6 +21,7 @@ rm(wd_workcomp, wd_laptop)
 
 ##PACKAGES
 library(dplyr)
+library(tidyr)
 
 ##DATA
 
@@ -30,20 +31,24 @@ look <- read.csv("migstatus-prelimlook.csv") %>%
                     "TimingSpr15", "TimingFall15", "Notes"))
 
 # HR overlap 
-##manual area overlap; automated volume intersection
-hro <- read.csv("overlap-auto-vi.csv") #automated
-hrm <- read.csv("overlap-manual.csv") #manual
-hro <- full_join(hro, hrm, by = "AnimalID") 
-rm(hrm)
+ao <- read.csv("areaoverlap.csv") 
+ao <- ao[rowSums(is.na(ao)) !=2,]
+vi <- read.csv("volumeintersection.csv")
+vi <- vi[rowSums(is.na(vi)) !=2,]
+hro <- select(vi, -AnimalID) %>%
+  full_join(ao, by = "IndivYr") 
 
 # NSD
-nsd <- read.csv("nsd-avg.csv", header = TRUE)
+nsd <- read.csv("nsd-avg.csv", header = TRUE) 
+nsd <- nsd[rowSums(is.na(nsd)) !=2,]
 
-# everything
-all <- full_join(look, hro, by = "AnimalID")
-all <- full_join(all, nsd, by = "AnimalID")
-all <- all[!(is.na(all$Status)) | !(is.na(all$spr14ao)) | !(is.na(all$spr15ao)),]
-        #remove early drops that have no migration data
+# All together
+mig <- select(nsd, -AnimalID) %>%
+  rename(SprNSD = SprAvgNSD, FallNSD = FallAvgNSD) %>%
+  full_join(hro, by = "IndivYr") %>%
+  select(IndivYr, AnimalID, SprAO, FallAO, SprVI, FallVI, SprNSD, FallNSD)
+write.csv(mig, file="migration-analysis.csv", row.names=F)
+
 
 ###############################
 ## PLOTS
