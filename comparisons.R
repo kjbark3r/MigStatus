@@ -32,15 +32,15 @@ look <- read.csv("migstatus-prelimlook.csv") %>%
 
 # HR overlap 
 ao <- read.csv("areaoverlap.csv") 
-ao <- ao[rowSums(is.na(ao)) !=2,]
+ao <- ao[rowSums(is.na(ao)) !=2,] #remove nas
 vi <- read.csv("volumeintersection.csv")
-vi <- vi[rowSums(is.na(vi)) !=2,]
+vi <- vi[rowSums(is.na(vi)) !=2,] #remove nas
 hro <- select(vi, -AnimalID) %>%
   full_join(ao, by = "IndivYr") 
 
 # NSD
-nsd <- read.csv("nsd-avg.csv", header = TRUE) 
-nsd <- nsd[rowSums(is.na(nsd)) !=2,]
+nsd <- read.csv("nsd-avg-total.csv", header = TRUE) 
+nsd <- nsd[rowSums(is.na(nsd)) !=2,] #remove nas
 
 # All together
 mig <- select(nsd, -AnimalID) %>%
